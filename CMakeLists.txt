@@ -12,5 +12,5 @@ FetchContent_Declare(pugixml
     GIT_SHALLOW    TRUE)
 FetchContent_MakeAvailable(pugixml)
 
-add_executable(upd_parser src/main.cpp)
+add_executable(upd_parser src/main.cpp src/upd_pars.cpp)
 target_link_libraries(upd_parser PRIVATE pugixml::pugixml)

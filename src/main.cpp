@@ -1,16 +1,13 @@
 #include <iostream>
-#include <ostream>
 #include <pugixml.hpp>
+#include <string>
+#include "upd_model.hpp"
+#include "upd_pars.hpp"
 
 int main() {
-    pugi::xml_document doc;
-    pugi::xml_parse_result result = doc.load_file("samples/upd_example_utf8.xml");
+    const char* path = "samples/upd_example_utf8.xml";
+    Upd upd = parse_upd(path);
 
-    if (!result) {
-        std::cerr << "Ошибка XML: " << result.description() << '\n';
-        return 1;
-    }
+    std::cout<<upd.date<<std::endl;
 
-    pugi::xml_node file = doc.child("Файл");
-    std::cout << "Версия формата: " << file.attribute("ВерсФорм").value() << '\n';
 }
