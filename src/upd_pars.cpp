@@ -1,4 +1,5 @@
 #include "upd_pars.hpp"
+#include "money.hpp"
 #include "upd_model.hpp"
 #include <pugixml.hpp>
 #include <string>
@@ -97,6 +98,8 @@ Upd parse_upd(const char* path)
     pugi::xml_node file = required_child(doc, "Файл");
     pugi::xml_node document = required_child(file,"Документ");
     pugi::xml_node invoice = required_child(document,"СвСчФакт");
+    pugi::xml_node table_sch = required_child(document, "ТаблСчФакт");
+    pugi::xml_node total_money = required_child(table_sch, "ВсегоОпл");
 
     Upd upd;
     upd.file_id = required_attribute(file, "ИдФайл");
@@ -107,6 +110,5 @@ Upd parse_upd(const char* path)
     upd.currency_code = required_attribute(required_child(invoice, "ДенИзм"), "КодОКВ");
     upd.seller = parse_party(required_child(invoice,"СвПрод")); 
     upd.buyer = parse_party(required_child(invoice,"СвПокуп"));
-    
     return upd; 
 }

@@ -1,6 +1,8 @@
 #pragma once
 
 //#include <optional>
+#include "money.hpp"
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -21,17 +23,17 @@ struct Item
     std::string unit_name;          // НаимЕдИзм
     std::string quantity;           // КолТов
     std::string price;              // ЦенаТов
-    std::string sum_without_nds;    // СтТовБезНДС
+    Money sum_without_nds;          // СтТовБезНДС
     std::string nds_rate;           // НалСт: "22%", "10%", "без НДС"
-    std::string nds;                // СумНал; пусто, если "без НДС"
-    std::string sum_with_nds;       // СтТовУчНал
+    std::optional<Money> nds;       // СумНал; пусто, если "без НДС"
+    Money sum_with_nds;             // СтТовУчНал
 };
 
 struct Totals
 {
-    std::string without_nds; // Итоговая сумма без НДС
-    std::string nds;         // Сумма НДС  
-    std::string with_nds;    // Итоговая сумма с НДС
+    Money without_nds;          // Итоговая сумма без НДС
+    std::optional<Money> nds;  // Сумма НДС  
+    Money with_nds;             // Итоговая сумма с НДС
 };
 
 struct Upd
