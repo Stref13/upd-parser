@@ -17,7 +17,7 @@ struct Party
 
 struct Item
 {
-    int line_number;                // НомСтр
+    int line_number = 0;            // НомСтр
     std::string name;               // НаимТов
     std::string unit_code;          // ОКЕИ_Тов, код единицы измерения
     std::string unit_name;          // НаимЕдИзм
@@ -32,7 +32,7 @@ struct Item
 struct Totals
 {
     Money without_nds;          // Итоговая сумма без НДС
-    std::optional<Money> nds;  // Сумма НДС  
+    std::optional<Money> nds;   // Сумма НДС  
     Money with_nds;             // Итоговая сумма с НДС
 };
 

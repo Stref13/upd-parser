@@ -1,6 +1,7 @@
 #include "upd_pars.hpp"
 #include "money.hpp"
 #include "upd_model.hpp"
+#include <optional>
 #include <pugixml.hpp>
 #include <string>
 #include <string_view>
@@ -43,6 +44,36 @@ std::string required_attribute (pugi::xml_node node, const char* attr)
         throw ParseError("Нет обязательного аттрибута: " + path_of(node) + "/@"+attr);
     }
     return attribute.value();
+}
+
+Money required_money_attr(pugi::xml_node node, const char* name)
+{
+    std::string attr = required_attribute(node, name);
+    std::optional<Money> m = parse_money(attr);
+    if (!m)
+    {
+        throw ParseError("Не сумма в " + path_of(node) + 
+                    ": " + attr);
+    }
+    else
+    {
+        return *m;
+    }
+}
+
+std::optional<Money> parse_nds_choice(pugi::xml_node node)
+{
+    if(node.child("БезНДС")) return std::nullopt;
+    else
+    {
+        pugi::xml_node ch = required_child(node, "СумНал");
+        auto money= parse_money(ch.text().as_string());
+        if(!money)
+        {
+            throw ParseError("Не сумма в " + path_of(ch));
+        }
+        return money;
+    }  
 }
 
 Party parse_party(pugi::xml_node node)

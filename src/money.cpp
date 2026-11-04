@@ -8,15 +8,17 @@
 #include <system_error>
 #include <algorithm>
 
-bool is_digit(const std::string_view& part)
-{
-    for(char c : part)
-    {
-        if(c < '0' || c > '9') return false;
-    }
-    return true; 
-}
+namespace {
 
+    bool is_digits(std::string_view part)
+    {
+        for(char c : part)
+        {
+            if(c < '0' || c > '9') return false;
+        }
+        return true; 
+    }
+}
 std::optional<Money> parse_money(std::string_view text)
 {
     if (text.empty()) return std::nullopt;
@@ -33,8 +35,8 @@ std::optional<Money> parse_money(std::string_view text)
     const std::string_view frac_part = 
         dot == std::string_view::npos ? std::string_view{} : text.substr(dot+1);
     
-    if (int_part.empty() || frac_part.size() > 2 || !is_digit(int_part)) return std::nullopt;
-    if (!is_digit(int_part) || !is_digit(frac_part)) return std::nullopt;
+    if (int_part.empty() || frac_part.size() > 2) return std::nullopt;
+    if (!is_digits(int_part) || !is_digits(frac_part)) return std::nullopt;
     std::int64_t rubles = 0;
     auto [p1,ec1] = std::from_chars(int_part.data(),int_part.data()+int_part.size(),rubles);
     if(ec1 != std::errc{} || p1 != int_part.data() + int_part.size()) return std::nullopt;
