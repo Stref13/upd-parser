@@ -64,16 +64,15 @@ Money required_money_attr(pugi::xml_node node, const char* name)
 std::optional<Money> parse_nds_choice(pugi::xml_node node)
 {
     if(node.child("БезНДС")) return std::nullopt;
-    else
+
+    pugi::xml_node ch = required_child(node, "СумНал");
+    auto money= parse_money(ch.text().as_string());
+    if(!money)
     {
-        pugi::xml_node ch = required_child(node, "СумНал");
-        auto money= parse_money(ch.text().as_string());
-        if(!money)
-        {
-            throw ParseError("Не сумма в " + path_of(ch));
-        }
-        return money;
-    }  
+        throw ParseError("Не сумма в " + path_of(ch));
+    }
+    return money;
+
 }
 
 Party parse_party(pugi::xml_node node)
@@ -106,6 +105,23 @@ Party parse_party(pugi::xml_node node)
     return party;
 }
 
+Item parse_item(pugi::xml_node node)
+{
+    Item item;
+
+    item.line_number = node.attribute("НомСтр").as_int();
+    item.name = required_attribute(node, "НаимТов");
+    item.unit_code = node.attribute("ОКЕИ_Тов").value();
+    item.unit_name = node.attribute("НаимЕдИзм").value();
+    item.quantity = node.attribute("КолТов").value();
+    item.price = node.attribute("ЦенаТов").value();
+    item.sum_without_nds = required_money_attr(node, "СтТовБезНДС");
+    item.nds_rate = required_attribute(node, "НалСт");
+    item.sum_with_nds = required_money_attr(node, "СтТовУчНал");
+    item.nds = parse_nds_choice(required_child(node, "СумНал"));
+
+    return item;
+}
 
 } // namespace
 
@@ -141,5 +157,14 @@ Upd parse_upd(const char* path)
     upd.currency_code = required_attribute(required_child(invoice, "ДенИзм"), "КодОКВ");
     upd.seller = parse_party(required_child(invoice,"СвПрод")); 
     upd.buyer = parse_party(required_child(invoice,"СвПокуп"));
+    for(auto row : table_sch.children("СведТов"))
+    {
+        upd.items.push_back(parse_item(row));
+    }
+    upd.totals.without_nds = required_money_attr(total_money, "СтТовБезНДСВсего");
+    upd.totals.with_nds = required_money_attr(total_money, "СтТовУчНалВсего");
+    upd.totals.nds = parse_nds_choice(required_child(total_money, "СумНалВсего"));
+
+
     return upd; 
 }
